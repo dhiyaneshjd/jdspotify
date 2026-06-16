@@ -1,0 +1,16 @@
+{
+  "name": "tamil-spotify-clone",
+  "version": "1.0.0",
+  "description": "Spotify-like web app for Tamil film songs with Wikipedia scraping, translation, CRUD, voice search, and visual effects",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
