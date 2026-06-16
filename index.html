@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JD's Music - Spotify Inspired Audio Lab</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow (VFX) -->
+  <div class="ambient-glow" id="ambient-glow"></div>
+  
+  <div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <i class="fa-solid fa-compact-disc logo-icon"></i>
+        <span class="logo-text">JD's Music<sup>Tamil</sup></span>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="active" id="nav-home"><a href="#"><i class="fa-solid fa-house"></i> <span>Home</span></a></li>
+          <li id="nav-favorites"><a href="#"><i class="fa-solid fa-heart"></i> <span>Favorites</span></a></li>
+          <li id="nav-wiki"><a href="#"><i class="fa-solid fa-earth-americas"></i> <span>Wiki Discover</span></a></li>
+          <li id="nav-dj-chat"><a href="#"><i class="fa-solid fa-robot"></i> <span>AI DJ Desk</span></a></li>
+        </ul>
+      </nav>
+      
+      <div class="sidebar-library">
+        <div class="library-header">
+          <span class="lib-title"><i class="fa-solid fa-list-ul"></i> Your Playlists</span>
+          <button class="add-playlist-btn" id="btn-new-playlist-sidebar" title="Create Playlist">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <div class="playlists-list" id="playlists-container">
+          <!-- Playlists rendered dynamically -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN APP SCREEN -->
+    <main class="app-main">
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="header-left">
+          <div class="search-bar-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="search-input" placeholder="Search songs, movies, artists...">
+            <button class="mic-btn" id="mic-btn" title="Voice Search">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <div class="sorting-controls">
+            <span class="sort-label">Sort by:</span>
+            <select id="sort-select">
+              <option value="default">Default</option>
+              <option value="title-az">Song (A-Z)</option>
+              <option value="movie-az">Movie (A-Z)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btn-add-song-header">
+            <i class="fa-solid fa-plus"></i> Add Song
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT SECTIONS -->
+      <section class="main-content-scroll" id="main-content-area">
+        <!-- Section: Library Grid -->
+        <div class="content-section active" id="section-library">
+          <div class="section-title-bar">
+            <h1 id="library-title">All Songs</h1>
+            <span class="song-count-badge" id="song-count">0 songs</span>
+          </div>
+          
+          <div class="song-grid" id="song-grid-container">
+            <!-- Song cards loaded dynamically -->
+          </div>
+        </div>
+
+        <!-- Section: Wikipedia Scraped Films -->
+        <div class="content-section" id="section-wiki">
+          <div class="section-title-bar">
+            <div>
+              <h1>Wikipedia Discover</h1>
+              <p class="section-subtitle">Tamil films released in 2025 & 2026. Click any film to add it to your player library.</p>
+            </div>
+            <button class="btn btn-secondary" id="btn-refresh-wiki">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+          </div>
+          
+          <div class="wiki-loader" id="wiki-loader">
+            <div class="spinner"></div>
+            <p>Scraping Wikipedia pages for 2025 & 2026 Tamil films...</p>
+          </div>
+          
+          <div class="wiki-grid" id="wiki-grid-container" style="display: none;">
+            <!-- Scraped films rendered here -->
+          </div>
+        </div>
+
+        <!-- Section: AI DJ Chat Desk -->
+        <div class="content-section" id="section-dj-chat">
+          <div class="section-title-bar">
+            <div>
+              <h1>Resident AI DJ Chat Desk</h1>
+              <p class="section-subtitle">Interact with our musical assistant. Ask for song recommendations, explore genres, or query our tracks list.</p>
+            </div>
+          </div>
+          
+          <div class="dj-chat-wrapper">
+            <div class="dj-chat-messages" id="dj-chat-logs">
+              <div class="chat-bubble dj">
+                <span class="chat-avatar">🎧</span>
+                <div class="chat-bubble-content">
+                  <p>Yo! Welcome to the DJ Desk at **JD's Music**! 🎵 I am your Resident AI Host. What kind of vibe or track are you looking for today? Type below or speak to me!</p>
+                </div>
+              </div>
+            </div>
+            <form class="dj-chat-input-tray" id="dj-chat-form">
+              <input type="text" id="dj-chat-input" placeholder="Say hello or ask for recommendations..." required autocomplete="off">
+              <button type="submit" class="chat-send-btn" id="btn-chat-send" title="Send message">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- PERSISTENT FOOTER MUSIC PLAYER BAR (Desktop Layout) -->
+  <footer class="player-bar" id="player-bar">
+    <!-- Cover Art & Meta Info -->
+    <div class="player-left" id="player-meta-info">
+      <div class="player-cover-wrapper" id="mini-player-trigger">
+        <img id="player-cover-art" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=60" alt="Cover Art">
+        <div class="cover-overlay"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></div>
+      </div>
+      <div class="player-song-details">
+        <div class="song-titles">
+          <span class="player-song-title" id="player-song-title">No song playing</span>
+          <span class="player-song-tamil" id="player-song-tamil"></span>
+        </div>
+        <span class="player-song-movie" id="player-song-movie">Select a song from library</span>
+      </div>
+      <button class="player-heart-btn" id="player-heart-btn" title="Add to Favorites">
+        <i class="fa-regular fa-heart"></i>
+      </button>
+    </div>
+
+    <!-- Central Control Interface -->
+    <div class="player-center">
+      <div class="playback-controls">
+        <button class="control-btn" id="control-shuffle" title="Shuffle"><i class="fa-solid fa-shuffle"></i></button>
+        <button class="control-btn" id="control-prev" title="Previous"><i class="fa-solid fa-backward-step"></i></button>
+        <button class="control-btn" id="control-skip-back" title="Backward 10s"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+        <button class="play-pause-btn" id="control-play-pause" title="Play"><i class="fa-solid fa-play"></i></button>
+        <button class="control-btn" id="control-skip-forward" title="Forward 10s"><i class="fa-solid fa-arrow-rotate-right"></i></button>
+        <button class="control-btn" id="control-next" title="Next"><i class="fa-solid fa-forward-step"></i></button>
+        <button class="control-btn" id="control-repeat" title="Repeat"><i class="fa-solid fa-repeat"></i></button>
+      </div>
+      <div class="timeline-bar-wrapper">
+        <span class="time-lbl" id="time-current">0:00</span>
+        <input type="range" class="timeline-slider" id="player-timeline" min="0" max="100" value="0">
+        <span class="time-lbl" id="time-duration">0:00</span>
+      </div>
+    </div>
+
+    <!-- Visualizer, Volume & Downloads -->
+    <div class="player-right">
+      <button class="control-btn" id="player-lyrics-toggle" title="Toggle Lyrics Lab">
+        <i class="fa-solid fa-quote-left"></i>
+      </button>
+      
+      <button class="control-btn" id="player-visualizer-toggle" title="Toggle VFX Visualizer">
+        <i class="fa-solid fa-circle-nodes"></i>
+      </button>
+      
+      <button class="control-btn" id="player-playlist-add" title="Add to Playlist">
+        <i class="fa-solid fa-folder-plus"></i>
+      </button>
+      
+      <a class="control-btn" id="player-download-btn" href="#" download title="Download Song">
+        <i class="fa-solid fa-download"></i>
+      </a>
+      
+      <div class="volume-bar-wrapper">
+        <button class="control-btn" id="player-volume-icon" title="Mute/Unmute"><i class="fa-solid fa-volume-high"></i></button>
+        <input type="range" class="volume-slider" id="player-volume" min="0" max="100" value="70">
+      </div>
+    </div>
+  </footer>
+
+  <!-- MOBILE FULL-SCREEN PLAYER SHEET (VFX & Cinematic Wallpaper) -->
+  <div class="mobile-player-sheet" id="mobile-player-sheet">
+    <div class="sheet-background-wallpaper" id="sheet-wallpaper"></div>
+    <div class="sheet-background-blur"></div>
+    
+    <div class="sheet-header">
+      <button class="sheet-close-btn" id="mobile-sheet-close" title="Minimize">
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <span class="sheet-header-title">Now Playing</span>
+      <button class="sheet-options-btn" id="mobile-sheet-download" title="Download">
+        <i class="fa-solid fa-download"></i>
+      </button>
+    </div>
+    
+    <div class="sheet-content">
+      <div class="mobile-visualizer-container">
+        <!-- Interactive Canvas visualizer inside mobile player -->
+        <canvas id="mobile-visualizer-canvas"></canvas>
+        <img class="mobile-album-art" id="mobile-cover-art" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=300" alt="Album Art">
+      </div>
+      
+      <div class="mobile-song-meta">
+        <div class="meta-left">
+          <h2 class="mobile-title" id="mobile-song-title">No song playing</h2>
+          <h3 class="mobile-tamil" id="mobile-song-tamil"></h3>
+          <p class="mobile-movie" id="mobile-song-movie">Select a song from library</p>
+        </div>
+        <button class="mobile-heart-btn" id="mobile-heart-btn">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+      
+      <div class="mobile-controls-wrapper">
+        <div class="mobile-timeline">
+          <input type="range" class="timeline-slider" id="mobile-player-timeline" min="0" max="100" value="0">
+          <div class="mobile-time-labels">
+            <span id="mobile-time-current">0:00</span>
+            <span id="mobile-time-duration">0:00</span>
+          </div>
+        </div>
+        
+        <div class="mobile-playback-controls">
+          <button class="control-btn btn-sm" id="mobile-shuffle"><i class="fa-solid fa-shuffle"></i></button>
+          <button class="control-btn" id="mobile-prev"><i class="fa-solid fa-backward-step"></i></button>
+          <button class="play-pause-btn btn-lg" id="mobile-play-pause"><i class="fa-solid fa-play"></i></button>
+          <button class="control-btn" id="mobile-next"><i class="fa-solid fa-forward-step"></i></button>
+          <button class="control-btn btn-sm" id="mobile-repeat"><i class="fa-solid fa-repeat"></i></button>
+        </div>
+        
+        <div class="mobile-extra-controls">
+          <button class="control-btn" id="mobile-playlist-add" title="Add to Playlist"><i class="fa-solid fa-folder-plus"></i></button>
+          <button class="control-btn" id="mobile-lyrics-toggle" title="Toggle Lyrics"><i class="fa-solid fa-quote-left"></i></button>
+          <button class="control-btn" id="mobile-volume-toggle"><i class="fa-solid fa-volume-high"></i></button>
+          <button class="control-btn" id="mobile-vfx-toggle" title="Toggle Visualizer Style"><i class="fa-solid fa-circle-nodes"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LYRICS LAB PANEL (Interactive Rolling Timelines & Translators) -->
+  <div class="lyrics-lab-overlay" id="lyrics-lab-overlay">
+    <div class="lyrics-lab-container">
+      <div class="lyrics-lab-header">
+        <div class="song-meta-lyrics">
+          <h2 id="lyrics-song-title">Song Title</h2>
+          <p id="lyrics-song-artist">Artist Name</p>
+        </div>
+        <div class="lyrics-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-lyrics-translate">
+            <i class="fa-solid fa-language"></i> Translate
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-lyrics-explain">
+            <i class="fa-solid fa-circle-info"></i> Explain Theme
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-lyrics-rewrite">
+            <i class="fa-solid fa-pencil"></i> Rewrite Genre
+          </button>
+        </div>
+        <button class="close-overlay-btn" id="btn-close-lyrics"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+      
+      <div class="lyrics-split-layout">
+        <!-- Left Side: Interactive Rolling Timed Lyrics -->
+        <div class="lyrics-scroll-panel" id="lyrics-scroll-container">
+          <!-- LRC lyrics generated here dynamically -->
+          <p class="lyric-line-placeholder">Play a song to view lyrics</p>
+        </div>
+        
+        <!-- Right Side: AI Assistant Output Panel -->
+        <div class="lyrics-ai-panel" id="lyrics-ai-container">
+          <div class="ai-output-placeholder" id="lyrics-ai-placeholder">
+            <i class="fa-solid fa-robot"></i>
+            <p>Click "Translate", "Explain Theme", or "Rewrite Genre" to activate Gemini AI analysis.</p>
+          </div>
+          <div class="ai-output-content hidden" id="lyrics-ai-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DYNAMIC DESKTOP CANVAS VISUALIZER WRAPPER (Floating Backdrop VFX) -->
+  <div class="desktop-visualizer-overlay" id="desktop-visualizer-overlay">
+    <canvas id="desktop-canvas-visualizer"></canvas>
+    
+    <!-- Controls Tray -->
+    <div class="visualizer-controls-panel">
+      <div class="vis-control-group">
+        <label for="vis-style-select">Visual Style</label>
+        <select id="vis-style-select">
+          <option value="spectrum">Spectrum (Bounce)</option>
+          <option value="eclipse">Eclipse (Ring)</option>
+          <option value="stardust">Stardust (Bokeh)</option>
+          <option value="oscilloscope">Oscilloscope (Retro)</option>
+        </select>
+      </div>
+      <div class="vis-control-group">
+        <label for="vis-color-select">Color Scheme</label>
+        <select id="vis-color-select">
+          <option value="spotify">Spotify Neon</option>
+          <option value="cyberpunk">Cyberpunk Pink</option>
+          <option value="cosmic">Cosmic Aura</option>
+          <option value="sunset">Sunset Orange</option>
+          <option value="midnight">Midnight Blue</option>
+        </select>
+      </div>
+    </div>
+    
+    <button class="close-overlay-btn" id="btn-close-visualizer"><i class="fa-solid fa-xmark"></i> Close Visualizer</button>
+  </div>
+
+  <!-- VOICE SEARCH OVERLAY -->
+  <div class="voice-search-overlay" id="voice-overlay">
+    <div class="voice-card">
+      <div class="pulse-ring"></div>
+      <div class="mic-sphere">
+        <i class="fa-solid fa-microphone"></i>
+      </div>
+      <h3 class="voice-status" id="voice-status">Listening...</h3>
+      <p class="voice-transcript" id="voice-transcript">Speak the song title or film name</p>
+      <button class="btn btn-secondary" id="btn-close-voice">Cancel</button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT SONG -->
+  <div class="modal-backdrop" id="modal-song">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="song-modal-title">Add New Song</h2>
+        <button class="close-modal-btn" id="btn-close-song-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form class="modal-form" id="song-form">
+        <input type="hidden" id="form-song-id">
+        <div class="form-group">
+          <label for="form-title">Song Title (English) <span class="required">*</span></label>
+          <input type="text" id="form-title" placeholder="e.g. Arabic Kuthu" required>
+        </div>
+        <div class="form-group">
+          <label for="form-title-tamil">Song Title (Tamil) <span class="hint">(Leave blank for auto-translation)</span></label>
+          <input type="text" id="form-title-tamil" placeholder="e.g. அரபிக் குத்து">
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="form-movie">Film/Movie Name</label>
+            <input type="text" id="form-movie" placeholder="e.g. Beast">
+          </div>
+          <div class="form-group">
+            <label for="form-artist">Composer / Artist</label>
+            <input type="text" id="form-artist" placeholder="e.g. Anirudh Ravichander">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="form-audio-url">Audio File Link (MP3/CORS-enabled URL) <span class="required">*</span></label>
+          <input type="url" id="form-audio-url" placeholder="https://example.com/song.mp3" required>
+        </div>
+        <div class="form-group">
+          <label for="form-cover-url">Album Cover Image Link</label>
+          <input type="url" id="form-cover-url" placeholder="https://example.com/cover.jpg">
+        </div>
+        <div class="form-group">
+          <label for="form-accent-color">Aesthetic Theme Accent Color</label>
+          <div class="color-picker-grid">
+            <label class="color-chip-label"><input type="radio" name="accent" value="#1db954" checked><span style="background-color: #1db954;"></span></label>
+            <label class="color-chip-label"><input type="radio" name="accent" value="#7c3aed"><span style="background-color: #7c3aed;"></span></label>
+            <label class="color-chip-label"><input type="radio" name="accent" value="#eab308"><span style="background-color: #eab308;"></span></label>
+            <label class="color-chip-label"><input type="radio" name="accent" value="#06b6d4"><span style="background-color: #06b6d4;"></span></label>
+            <label class="color-chip-label"><input type="radio" name="accent" value="#ec4899"><span style="background-color: #ec4899;"></span></label>
+            <label class="color-chip-label"><input type="radio" name="accent" value="#f97316"><span style="background-color: #f97316;"></span></label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-song">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-song">Save Song</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE PLAYLIST -->
+  <div class="modal-backdrop" id="modal-playlist">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h2>Create Playlist</h2>
+        <button class="close-modal-btn" id="btn-close-playlist-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form class="modal-form" id="playlist-form">
+        <div class="form-group">
+          <label for="playlist-name">Playlist Name <span class="required">*</span></label>
+          <input type="text" id="playlist-name" placeholder="e.g. Late Night Tamil Melodies" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-playlist">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD SONG TO PLAYLIST SELECTOR -->
+  <div class="modal-backdrop" id="modal-add-to-playlist">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h2>Add to Playlist</h2>
+        <button class="close-modal-btn" id="btn-close-add-to-playlist-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body playlist-selector-body" id="playlist-selector-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIO ENGINE -->
+  <audio id="audio-engine" preload="auto"></audio>
+
+  <!-- JS Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
